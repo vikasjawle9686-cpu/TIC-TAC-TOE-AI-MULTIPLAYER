@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tic Tac Territory</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<body>
+
+<div class="app-container">
+
+  <!-- LEFT PANEL -->
+  <aside class="panel left-panel">
+    <div class="panel-header">
+      <h2>OPERATOR</h2>
+    </div>
+
+    <div class="player-setup">
+      <div class="input-group">
+        <span class="title callsign-title">CALLSIGN</span>
+        <input type="text" id="player-name" value="COMMANDER" maxlength="12">
+      </div>
+
+      <div class="faction-select">
+        <span class="title faction-title">FACTION</span>
+        <div class="toggle-switch">
+          <button class="faction-btn active" data-symbol="X">X-RAY</button>
+          <button class="faction-btn" data-symbol="O">OSCAR</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="scoreboard">
+      <div class="score-row"><span>X-RAY WINS</span><span id="score-x">0</span></div>
+      <div class="score-row"><span>OSCAR WINS</span><span id="score-o">0</span></div>
+      <div class="score-row"><span>DRAWS</span><span id="score-draw">0</span></div>
+      <div class="series-info">
+        <span>ROUND: <span id="current-round">1</span></span>
+        <span id="series-target">FREE PLAY</span>
+      </div>
+    </div>
+
+     <div class="battle-log">
+      <h3>BATTLE LOG</h3>
+      <div id="log-container" class="log-entries">
+        <div class="log-entry system">&gt; SYSTEM READY</div>
+      </div>
+    </div>
+  </aside>
+
+
+  <!-- CENTER GAME AREA -->
+  <main class="game-area">
+    <div id="game-container" class="game-board-container mode-territory"></div>
+
+    <div id="time-mode-overlay" class="hidden">
+      <div class="timer-bar">
+        <div class="timer-fill" id="timer-fill"></div>
+      </div>
+      <div class="timer-text">
+        DATA FLIP IN <span id="timer-seconds">10</span>s
+      </div>
+    </div>
+
+    <div id="game-status" class="status-message">
+      AWAITING INPUT...
+    </div>
+  </main>
+
+  <!-- RIGHT PANEL -->
+  <aside class="panel right-panel">
+    <div class="panel-header">
+      <h2>SYSTEMS</h2>
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <label>BATTLE MODE</label>
+        <select id="mode-select">
+          <option value="territory">TERRITORY (9 ZONES)</option>
+          <option value="normal">NORMAL</option>
+        </select>
+      </div>
+
+      <div class="control-group checkbox-group">
+        <label class="cyber-checkbox">
+          <input type="checkbox" id="time-mode-check">
+          <span class="checkmark"></span>
+          <label class="time-anomaly-title">TIME ANOMALY (10s)</label>
+        </label>
+      </div>
+
+      <div class="control-group">
+        <label>OPPONENT</label>
+        <select id="opponent-select">
+          <option value="human">LOCAL PVP</option>
+          <option value="ai">CPU OPPONENT</option>
+          <option value="online">ONLINE MULTIPLAYER</option>
+        </select>
+      </div>
+
+      <div class="control-group hidden" id="ai-difficulty-group">
+        <label>CPU DIFFICULTY</label>
+        <select id="ai-difficulty">
+          <option value="easy">EASY</option>
+          <option value="medium">MEDIUM</option>
+          <option value="hard">HARD</option>
+          <option value="impossible">IMPOSSIBLE</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>SERIES PROTOCOL</label>
+        <select id="series-select">
+          <option value="free">FREE PLAY</option>
+          <option value="3">BEST OF 3</option>
+          <option value="10">BEST OF 10</option>
+        </select>
+      </div>
+      <button id="new-game-btn" class="cyber-btn glitch-effect">
+  INITIALIZE NEW GAME
+</button>
+
+<!-- Multiplayer button put out of ui button -->
+<div class="control-group">
+  <label>MULTIPLAYER</label>
+  <button class="cyber-btn" onclick="createRoom()">CREATE ROOM</button>
+</div>
+
+<div class="control-group">
+  <input type="text" id="roomInput" placeholder="ENTER ROOM CODE" maxlength="6">
+  <button class="cyber-btn" onclick="joinRoom()">JOIN ROOM</button>
+</div>
+
+<div class="control-group hidden" id="leave-room-group">
+  <button class="cyber-btn cyber-btn-danger" onclick="closeRoom()">
+    CLOSE ROOM
+  </button>
+</div>
+
+
+<div class="control-group">
+  <label>ROOM STATUS</label>
+  <div id="room-status" style="color:#ffee00;font-family:Orbitron;">
+    NOT CONNECTED
+  </div>
+</div>
+
+        INITIALIZE NEW GAME
+      </button>
+    </div>
+
+
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay" class="modal-overlay hidden">
+  <div class="cyber-modal">
+    <h2 id="modal-title">VICTORY</h2>
+    <div id="modal-message"></div>
+    <button id="modal-close-btn" class="cyber-btn">ACKNOWLEDGE</button>
+  </div>
+</div>
+
+<!-- SOUND EFFECTS -->
+<audio id="sound-click" src="sounds/click.mp3" preload="auto"></audio>
+<audio id="sound-move" src="sounds/move.mp3" preload="auto"></audio>
+<audio id="sound-win" src="sounds/win.mp3" preload="auto"></audio>
+<audio id="sound-draw" src="sounds/draw.mp3" preload="auto"></audio>
+<audio id="sound-time" src="sounds/time.mp3" preload="auto"></audio>
+<audio id="sound-lose" src="sounds/lose.mp3" preload="auto"></audio>
+
+<!-- GAME LOGIC -->
+<script src="script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,657 @@
+:root {
+    --bg-color: #050a10;
+    --panel-bg: rgba(10, 20, 30, 0.9);
+    --neon-blue: #00f3ff;
+    --neon-pink: #ff0055;
+    --neon-green: #00ff66;
+    --neon-yellow: #ffee00;
+    --grid-line: rgba(0, 243, 255, 0.2);
+    --text-main: #e0faff;
+    --text-dim: #608090;
+    
+    --font-head: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+    
+    --glow-strength: 0 0 10px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    height: 100vh;
+    overflow: hidden;
+    background-image: 
+        linear-gradient(rgba(0, 20, 40, 0.8) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 20, 40, 0.8) 1px, transparent 1px);
+    background-size: 40px 40px;
+}
+
+/* Layout */
+.app-container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    max-width: 1920px;
+    margin: 0 auto;
+}
+
+.panel {
+    width: 300px;
+    background: var(--panel-bg);
+    border-right: 1px solid var(--grid-line);
+    border-left: 1px solid var(--grid-line);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    backdrop-filter: blur(5px);
+    z-index: 10;
+}
+
+.game-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 20px;
+}
+
+/* Typography & Headers */
+h2 {
+    font-family: var(--font-head);
+    color: var(--neon-blue);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px var(--neon-blue);
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    border-bottom: 2px solid var(--neon-blue);
+    padding-bottom: 5px;
+}
+
+h3 {
+    font-family: var(--font-head);
+    font-size: 1rem;
+    color: var(--neon-green);
+    margin-bottom: 10px;
+}
+
+label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+/* Inputs & Controls */
+input, select {
+    width: 100%;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--grid-line);
+    color: var(--neon-blue);
+    padding: 8px;
+    font-family: var(--font-head);
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.3s;
+}
+
+input:focus, select:focus {
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 10px rgba(255, 0, 85, 0.3);
+}
+
+.cyber-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid var(--neon-blue);
+    color: var(--neon-blue);
+    font-family: var(--font-head);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+}
+
+.cyber-btn:hover {
+    background: var(--neon-blue);
+    color: #000;
+    box-shadow: 0 0 15px var(--neon-blue);
+}
+
+.cyber-btn:active {
+    transform: scale(0.98);
+}
+
+.faction-select .toggle-switch {
+    display: flex;
+    border: 1px solid var(--grid-line);
+}
+
+.faction-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    padding: 10px;
+    cursor: pointer;
+    font-family: var(--font-head);
+    transition: all 0.3s;
+}
+
+.faction-btn.active[data-symbol="X"] {
+    background: var(--neon-blue);
+    color: #000;
+    box-shadow: 0 0 10px var(--neon-blue);
+}
+
+.faction-btn.active[data-symbol="O"] {
+    background: var(--neon-pink);
+    color: #000;
+    box-shadow: 0 0 10px var(--neon-pink);
+}
+
+/* Checkbox */
+.cyber-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-family: var(--font-head);
+    color: var(--neon-yellow);
+}
+
+.cyber-checkbox input {
+    display: none;
+}
+
+.checkmark {
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--neon-yellow);
+    display: inline-block;
+    position: relative;
+}
+
+.cyber-checkbox input:checked + .checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--neon-yellow);
+    font-size: 14px;
+}
+
+/* Scoreboard */
+.score-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.score-row .value {
+    font-family: var(--font-head);
+    font-weight: bold;
+}
+
+#score-x { color: var(--neon-blue); }
+#score-o { color: var(--neon-pink); }
+
+.series-info {
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--text-dim);
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--neon-yellow);
+}
+
+/* Game Board */
+#game-container {
+    display: grid;
+    gap: 15px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--grid-line);
+    box-shadow: 0 0 30px rgba(0, 243, 255, 0.05);
+    transition: all 0.5s ease;
+}
+
+/* Modes */
+.mode-territory {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: 600px;
+    height: 600px;
+}
+
+.mode-normal {
+    grid-template-columns: 1fr;
+    width: 300px;
+    height: 300px;
+}
+
+
+
+/* Individual Land (3x3 grid) */
+.land {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 4px;
+    background: rgba(0, 20, 40, 0.5);
+    border: 1px solid rgba(0, 243, 255, 0.1);
+    padding: 4px;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.land.winner-X {
+    border: 2px solid var(--neon-blue);
+    box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.3);
+}
+
+.land.winner-O {
+    border: 2px solid var(--neon-pink);
+    box-shadow: inset 0 0 20px rgba(255, 0, 85, 0.3);
+}
+
+.land-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    font-family: var(--font-head);
+    font-weight: 900;
+    z-index: 5;
+    background: rgba(5, 10, 16, 0.7);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+}
+
+.land.winner-X .land-overlay {
+    opacity: 1;
+    color: var(--neon-blue);
+    text-shadow: 0 0 20px var(--neon-blue);
+}
+
+.land.winner-O .land-overlay {
+    opacity: 1;
+    color: var(--neon-pink);
+    text-shadow: 0 0 20px var(--neon-pink);
+}
+
+/* Cell */
+.cell {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-family: var(--font-head);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    color: #fff;
+}
+
+.cell:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.cell.taken {
+    cursor: default;
+}
+
+.cell.X {
+    color: var(--neon-blue);
+    text-shadow: 0 0 5px var(--neon-blue);
+}
+
+.cell.O {
+    color: var(--neon-pink);
+    text-shadow: 0 0 5px var(--neon-pink);
+}
+
+.cell.flipped {
+    animation: flip 0.5s ease;
+}
+
+@keyframes flip {
+    0% { transform: rotateY(0); }
+    50% { transform: rotateY(90deg); opacity: 0.5; }
+    100% { transform: rotateY(0); opacity: 1; }
+}
+
+/* Logs */
+.battle-log {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.log-entries {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse; /* Newest at bottom visually but we insert at top */
+    gap: 5px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.8rem;
+    padding-right: 5px;
+}
+
+/* Scrollbar */
+.log-entries::-webkit-scrollbar {
+    width: 5px;
+}
+.log-entries::-webkit-scrollbar-thumb {
+    background: var(--grid-line);
+}
+
+.log-entry {
+    padding: 4px 8px;
+    border-left: 2px solid var(--text-dim);
+    background: rgba(0,0,0,0.2);
+    animation: fadeIn 0.3s ease;
+}
+
+.log-entry.system { border-color: var(--neon-green); color: var(--neon-green); }
+.log-entry.X { border-color: var(--neon-blue); color: var(--text-main); }
+.log-entry.O { border-color: var(--neon-pink); color: var(--text-main); }
+.log-entry.event { border-color: var(--neon-yellow); color: var(--neon-yellow); }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateX(10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Status & Timer */
+.status-message {
+    margin-top: 20px;
+    font-family: var(--font-head);
+    font-size: 1.2rem;
+    color: var(--text-main);
+    text-align: center;
+    letter-spacing: 2px;
+    min-height: 30px;
+}
+
+#time-mode-overlay {
+    margin-top: 10px;
+    width: 600px;
+    text-align: center;
+}
+
+.timer-bar {
+    width: 100%;
+    height: 4px;
+    background: #333;
+    margin-bottom: 5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.timer-fill {
+    height: 100%;
+    background: var(--neon-yellow);
+    width: 100%;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 10px var(--neon-yellow);
+}
+
+.timer-text {
+    color: var(--neon-yellow);
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;          /* 🔥 THIS IS THE FIX */
+    backdrop-filter: blur(5px);
+}
+
+.hidden {
+    display: none !important;
+}
+
+.cyber-modal {
+    background: var(--bg-color);
+    border: 2px solid var(--neon-blue);
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 0 50px rgba(0, 243, 255, 0.2);
+    max-width: 500px;
+    width: 90%;
+}
+
+.cyber-modal h2 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+#modal-message {
+    font-size: 1.2rem;
+    color: var(--text-dim);
+    margin-bottom: 30px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .app-container {
+        flex-direction: column;
+        overflow-y: auto;
+    }
+    
+    .panel {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid var(--grid-line);
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .game-board-container {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        aspect-ratio: 1;
+    }
+
+    .mode-normal {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 2/1;
+    }
+}
+/* ===== ALL CONTROL TITLES SAME AS BATTLE LOG ===== */
+
+.right-panel .controls .control-group > label,
+#ai-difficulty-group > label,
+.room-status-label {
+  color: #1920ea !important;
+  letter-spacing: 1px;
+  text-shadow: 0 0 6px rgba(78, 83, 80, 0.927);
+
+}
+/* ===== CALL SIGN TITLE (FINAL FIX) ===== */
+.callsign-title {
+  color: #1920ea !important;
+  letter-spacing: 1px;
+  text-shadow: 0 0 6px rgba(78, 83, 80, 0.927);
+}
+/* ===== FACTION TITLE RED ===== */
+.faction-title {
+  color: #1920ea !important;
+  letter-spacing: 1px;
+  text-shadow: 0 0 6px rgba(78, 83, 80, 0.927);
+}
+/* ===== TIME ANOMALY NEON RED (BOX + TITLE) ===== */
+
+/* Whole clickable box */
+.cyber-checkbox {
+  border: 1px solid rgba(255, 0, 60, 0.7);
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  box-shadow:
+    0 0 6px rgba(255, 0, 60, 0.6),
+    inset 0 0 6px rgba(255, 0, 60, 0.4);
+
+  transition: all 0.25s ease;
+}
+
+/* TIME ANOMALY title text */
+.time-anomaly-title {
+  color: #ff003c !important;
+  letter-spacing: 1px;
+  text-shadow:
+    0 0 6px rgba(255, 0, 60, 0.9),
+    0 0 14px rgba(255, 0, 60, 0.7);
+}
+
+/* Fake checkbox (square / circle) */
+.cyber-checkbox .checkmark {
+  border: 2px solid #ff003c;
+  box-shadow:
+    0 0 6px rgba(255, 0, 60, 0.7),
+    inset 0 0 6px rgba(255, 0, 60, 0.5);
+}
+
+/* On hover = stronger glow */
+.cyber-checkbox:hover {
+  box-shadow:
+    0 0 12px rgba(255, 0, 60, 0.9),
+    inset 0 0 8px rgba(255, 0, 60, 0.6);
+}
+
+/* When checked = danger mode */
+#time-mode-check:checked ~ .checkmark {
+  background: #ff003c;
+  box-shadow:
+    0 0 12px rgba(255, 0, 60, 1),
+    inset 0 0 10px rgba(255, 0, 60, 0.8);
+}
+/* ===== ROOM STATUS : NOT CONNECTED ===== */
+#room-status {
+  color: #00ff9c;
+  letter-spacing: 1px;
+  text-shadow: 0 0 6px rgba(0, 255, 156, 0.6);
+}
+/* ===== MICRO SPACING FIX (GUARANTEED) ===== */
+
+/* SERIES PROTOCOL control-group ke baad thoda gap */
+.right-panel .control-group:nth-of-type(5) {
+  margin-bottom: 12px;
+}
+
+/* MULTIPLAYER control-group ke upar thoda gap */
+.right-panel .control-group:nth-of-type(6) {
+  margin-top: 6px;
+}
+/* ===== MICRO SPACING: OPPONENT → SERIES PROTOCOL ===== */
+
+/* Opponent control-group ke baad thoda gap */
+.right-panel .control-group:nth-of-type(3) {
+  margin-bottom: 12px;
+}
+/* ===== FIX: BATTLE LOG BOTTOM PUSH ISSUE ===== */
+
+/* Left panel ko normal column flow me rakho */
+.left-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;   /* 🔥 bottom push band */
+}
+
+/* Battle log ko auto-push se roko */
+.left-panel .battle-log {
+  margin-top: 10px;              /* scoreboard ke baad thoda gap */
+}
+
+/* Log entries ko normal top-aligned rakho */
+.left-panel .log-entries {
+  display: block;
+  margin-top: 4px;
+}
+
+/* Extra safety: kisi auto margin ko kill karo */
+.left-panel .battle-log,
+.left-panel .log-entries {
+  margin-bottom: 0;
+}
+
+/* ===== FIX: CALL SIGN → FACTION SPACING (REAL STRUCTURE) ===== */
+
+/* Call Sign input ke baad thoda gap */
+input#callsignInput {
+  margin-bottom: 10px;
+}
+
+/* Faction block ke upar thoda gap */
+.faction-select {
+  margin-top: 6px;
+}
+
+/* ===== CALL SIGN & FACTION TITLE BOLD ===== */
+
+.callsign-title,
+.faction-title {
+  font-weight: 700;   /* bold */
+}
+
+/* ===== LEAVE ROOM (RED VERSION OF CYBER BUTTON) ===== */
+.cyber-btn-danger {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+}
+
+.cyber-btn-danger:hover {
+  background: var(--neon-pink);
+  color: #000;
+  box-shadow: 0 0 15px var(--neon-pink);
+}
+
+/* Small spacing above Leave Room button */
+.cyber-btn-danger {
+  margin-top: 12px;
+}
